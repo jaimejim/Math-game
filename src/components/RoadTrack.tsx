@@ -9,6 +9,8 @@ interface RoadTrackProps {
   totalQuestions: number;
   winner: null | 1 | 2;
   isPlaying: boolean;
+  p1Stumble?: boolean;
+  p2Stumble?: boolean;
 }
 
 /**
@@ -22,6 +24,8 @@ export default function RoadTrack({
   totalQuestions,
   winner,
   isPlaying,
+  p1Stumble,
+  p2Stumble,
 }: RoadTrackProps) {
   // Scenery elements that scroll down the road
   const sceneryItems = useMemo(() => {
@@ -108,6 +112,7 @@ export default function RoadTrack({
           color="blue"
           isRunning={isPlaying && winner === null}
           isCelebrating={winner === 1}
+          isStumbling={!!p1Stumble}
           size={64}
         />
         <div
@@ -131,6 +136,7 @@ export default function RoadTrack({
           color="red"
           isRunning={isPlaying && winner === null}
           isCelebrating={winner === 2}
+          isStumbling={!!p2Stumble}
           size={64}
         />
         <div

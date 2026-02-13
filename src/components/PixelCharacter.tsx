@@ -6,6 +6,7 @@ interface PixelCharacterProps {
   color: "blue" | "red";
   isRunning: boolean;
   isCelebrating: boolean;
+  isStumbling?: boolean;
   size?: number;
 }
 
@@ -19,6 +20,7 @@ export default function PixelCharacter({
   color,
   isRunning,
   isCelebrating,
+  isStumbling = false,
   size = 80,
 }: PixelCharacterProps) {
   const [frame, setFrame] = useState(0);
@@ -83,8 +85,19 @@ export default function PixelCharacter({
     /* 15 */ [0,0,7,7,0,0,0,0,0,0,0,7,7,0,0,0],
   ];
 
+  // Stumble legs: splayed out flat (fallen over)
+  const legsStumble = [
+    /* 11 */ [0,0,0,0,0,2,2,0,0,2,2,0,0,0,0,0],
+    /* 12 */ [0,0,0,0,2,2,0,0,0,0,2,2,0,0,0,0],
+    /* 13 */ [0,0,2,2,0,0,0,0,0,0,0,0,2,2,0,0],
+    /* 14 */ [0,7,7,0,0,0,0,0,0,0,0,0,0,7,7,0],
+    /* 15 */ [7,7,0,0,0,0,0,0,0,0,0,0,0,0,7,7],
+  ];
+
   let legs: number[][];
-  if (!isRunning && !isCelebrating) {
+  if (isStumbling) {
+    legs = legsStumble;
+  } else if (!isRunning && !isCelebrating) {
     legs = legsNeutral;
   } else if (isCelebrating) {
     // Celebration: wide stance
@@ -108,7 +121,9 @@ export default function PixelCharacter({
 
   const px = size / 16;
 
-  const animClass = isCelebrating
+  const animClass = isStumbling
+    ? "char-stumble"
+    : isCelebrating
     ? "char-celebrate"
     : isRunning
     ? "char-running"

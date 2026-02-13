@@ -92,6 +92,8 @@ export default function Game() {
   const [p1Answered, setP1Answered] = useState(0);
   const [p2Answered, setP2Answered] = useState(0);
 
+  const [p1Stumble, setP1Stumble] = useState(false);
+  const [p2Stumble, setP2Stumble] = useState(false);
   const [muted, setMuted] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const winnerRef = useRef<null | 1 | 2>(null);
@@ -145,6 +147,8 @@ export default function Game() {
         const newProgress = Math.max(0, p1Progress - PENALTY);
         setP1Progress(newProgress);
         setP1Equation(generateEquation(diffRef.current));
+        setP1Stumble(true);
+        setTimeout(() => setP1Stumble(false), 600);
       }
     },
     [p1Progress, p1Answered, checkWinner]
@@ -172,6 +176,8 @@ export default function Game() {
         const newProgress = Math.max(0, p2Progress - PENALTY);
         setP2Progress(newProgress);
         setP2Equation(generateEquation(diffRef.current));
+        setP2Stumble(true);
+        setTimeout(() => setP2Stumble(false), 600);
       }
     },
     [p2Progress, p2Answered, checkWinner]
@@ -342,6 +348,8 @@ export default function Game() {
           totalQuestions={TOTAL_QUESTIONS}
           winner={winner}
           isPlaying={isPlaying}
+          p1Stumble={p1Stumble}
+          p2Stumble={p2Stumble}
         />
       </div>
 
