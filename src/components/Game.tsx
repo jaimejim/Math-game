@@ -125,7 +125,7 @@ export default function Game() {
   const [p2Stumble, setP2Stumble] = useState(false);
   const [p1Char, setP1Char] = useState(0);
   const [p2Char, setP2Char] = useState(1);
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(true);
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const winnerRef = useRef<null | 1 | 2>(null);
   const diffRef = useRef<Difficulty>("easy");
@@ -179,8 +179,9 @@ export default function Game() {
     setP1Equation(generateEquation(diff));
     setP2Equation(generateEquation(diff));
     startBGM();
+    setVolume(muted ? 0 : 0.3);
     startTimer();
-  }, [startTimer]);
+  }, [startTimer, muted]);
 
   const goToMenu = useCallback(() => {
     stopBGM();
