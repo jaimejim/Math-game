@@ -4,9 +4,17 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import MathPanel, { Equation } from "./MathPanel";
 import RoadTrack from "./RoadTrack";
 import Confetti from "./Confetti";
+import {
+  startBGM,
+  stopBGM,
+  playCorrectSFX,
+  playWrongSFX,
+  playWinSFX,
+  setVolume,
+} from "./ChiptuneAudio";
 
 const TOTAL_QUESTIONS = 10;
-const PENALTY = 1; // go back 1 step on wrong answer
+const PENALTY = 2; // go back 2 steps on wrong answer
 
 /** Generate a simple addition or subtraction equation for kids */
 function generateEquation(): Equation {
@@ -53,6 +61,7 @@ export default function Game() {
   const [p1Answered, setP1Answered] = useState(0); // questions answered
   const [p2Answered, setP2Answered] = useState(0);
 
+  const [muted, setMuted] = useState(false);
   const winnerRef = useRef<null | 1 | 2>(null);
 
   const startGame = useCallback(() => {
@@ -65,14 +74,17 @@ export default function Game() {
     winnerRef.current = null;
     setP1Equation(generateEquation());
     setP2Equation(generateEquation());
+    startBGM();
   }, []);
 
   const checkWinner = useCallback((player: 1 | 2, newProgress: number) => {
-    if (winnerRef.current !== null) return; // already have a winner
+    if (winnerRef.current !== null) return;
     if (newProgress >= TOTAL_QUESTIONS) {
       winnerRef.current = player;
       setWinner(player);
       setGameState("finished");
+      stopBGM();
+      playWinSFX();
     }
   }, []);
 
@@ -84,6 +96,7 @@ export default function Game() {
       setP1Answered(newAnswered);
 
       if (correct) {
+        playCorrectSFX();
         const newProgress = p1Progress + 1;
         setP1Progress(newProgress);
         checkWinner(1, newProgress);
@@ -93,6 +106,7 @@ export default function Game() {
           setP1Equation(null);
         }
       } else {
+        playWrongSFX();
         const newProgress = Math.max(0, p1Progress - PENALTY);
         setP1Progress(newProgress);
         setP1Equation(generateEquation());
@@ -109,6 +123,7 @@ export default function Game() {
       setP2Answered(newAnswered);
 
       if (correct) {
+        playCorrectSFX();
         const newProgress = p2Progress + 1;
         setP2Progress(newProgress);
         checkWinner(2, newProgress);
@@ -118,6 +133,7 @@ export default function Game() {
           setP2Equation(null);
         }
       } else {
+        playWrongSFX();
         const newProgress = Math.max(0, p2Progress - PENALTY);
         setP2Progress(newProgress);
         setP2Equation(generateEquation());
@@ -140,6 +156,20 @@ export default function Game() {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [gameState, handleP1Answer, handleP2Answer]);
+
+  // Toggle mute
+  const toggleMute = useCallback(() => {
+    setMuted((m) => {
+      const next = !m;
+      setVolume(next ? 0 : 0.3);
+      return next;
+    });
+  }, []);
+
+  // Stop music on unmount
+  useEffect(() => {
+    return () => stopBGM();
+  }, []);
 
   // ── Menu Screen ──
   if (gameState === "menu") {
@@ -179,6 +209,8 @@ export default function Game() {
             Tap ✓ if the answer is RIGHT
             <br />
             Tap ✗ if the answer is WRONG
+            <br />
+            Wrong = {PENALTY} steps back!
             <br />
             First to {TOTAL_QUESTIONS} wins! 🏆
           </p>
@@ -273,6 +305,15 @@ export default function Game() {
           bgColor="linear-gradient(180deg, #5f1e1e 0%, #1e293b 100%)"
         />
       </div>
+
+      {/* Mute toggle */}
+      <button
+        onClick={toggleMute}
+        className="fixed top-3 left-1/2 -translate-x-1/2 z-50 px-3 py-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all text-xl"
+        aria-label={muted ? "Unmute" : "Mute"}
+      >
+        {muted ? "🔇" : "🔊"}
+      </button>
 
       {/* Play Again button when finished */}
       {winner && (
