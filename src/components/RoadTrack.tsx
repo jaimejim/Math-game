@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
-import PixelCharacter from "./PixelCharacter";
+import PixelCharacter, { CHARACTERS } from "./PixelCharacter";
 
 interface RoadTrackProps {
   p1Progress: number; // 0-10
@@ -11,6 +11,8 @@ interface RoadTrackProps {
   isPlaying: boolean;
   p1Stumble?: boolean;
   p2Stumble?: boolean;
+  p1Char: number;
+  p2Char: number;
 }
 
 /**
@@ -26,6 +28,8 @@ export default function RoadTrack({
   isPlaying,
   p1Stumble,
   p2Stumble,
+  p1Char,
+  p2Char,
 }: RoadTrackProps) {
   // Scenery elements that scroll down the road
   const sceneryItems = useMemo(() => {
@@ -109,7 +113,7 @@ export default function RoadTrack({
         }}
       >
         <PixelCharacter
-          color="blue"
+          charIndex={p1Char}
           isRunning={isPlaying && winner === null}
           isCelebrating={winner === 1}
           isStumbling={!!p1Stumble}
@@ -133,7 +137,7 @@ export default function RoadTrack({
         }}
       >
         <PixelCharacter
-          color="red"
+          charIndex={p2Char}
           isRunning={isPlaying && winner === null}
           isCelebrating={winner === 2}
           isStumbling={!!p2Stumble}
@@ -157,9 +161,7 @@ export default function RoadTrack({
               fontFamily: "var(--font-pixel)",
               fontSize: "14px",
               textShadow: "2px 2px 4px #000",
-              background: winner === 1
-                ? "linear-gradient(135deg, #3b82f6, #1d4ed8)"
-                : "linear-gradient(135deg, #ef4444, #b91c1c)",
+              background: `linear-gradient(135deg, ${CHARACTERS[winner === 1 ? p1Char : p2Char]?.body ?? "#3b82f6"}, ${CHARACTERS[winner === 1 ? p1Char : p2Char]?.dark ?? "#1d4ed8"})`,
               boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
             }}
           >

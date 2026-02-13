@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import MathPanel, { Equation } from "./MathPanel";
 import RoadTrack from "./RoadTrack";
 import Confetti from "./Confetti";
+import PixelCharacter, { CHARACTERS } from "./PixelCharacter";
 import {
   startBGM,
   stopBGM,
@@ -94,6 +95,8 @@ export default function Game() {
 
   const [p1Stumble, setP1Stumble] = useState(false);
   const [p2Stumble, setP2Stumble] = useState(false);
+  const [p1Char, setP1Char] = useState(0);
+  const [p2Char, setP2Char] = useState(1);
   const [muted, setMuted] = useState(false);
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const winnerRef = useRef<null | 1 | 2>(null);
@@ -257,22 +260,68 @@ export default function Game() {
           </p>
         </div>
 
-        {/* Characters preview */}
-        <div className="relative z-10 flex gap-12 mb-6">
+        {/* Character selector */}
+        <div className="relative z-10 flex items-center gap-6 mb-6">
+          {/* Player 1 picker */}
           <div className="text-center">
-            <div className="text-6xl mb-2">🧑‍🦱</div>
-            <span className="text-blue-400" style={{ fontFamily: "var(--font-pixel)", fontSize: "10px" }}>
+            <span className="text-blue-400 block mb-2" style={{ fontFamily: "var(--font-pixel)", fontSize: "9px" }}>
               PLAYER 1
             </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setP1Char((c) => (c - 1 + CHARACTERS.length) % CHARACTERS.length)}
+                className="text-white/70 hover:text-white text-2xl px-1"
+                aria-label="Previous character"
+              >
+                ‹
+              </button>
+              <div className="flex flex-col items-center">
+                <PixelCharacter charIndex={p1Char} isRunning={false} isCelebrating={false} size={56} />
+                <span className="text-yellow-300 mt-1" style={{ fontFamily: "var(--font-pixel)", fontSize: "7px" }}>
+                  {CHARACTERS[p1Char].name}
+                </span>
+              </div>
+              <button
+                onClick={() => setP1Char((c) => (c + 1) % CHARACTERS.length)}
+                className="text-white/70 hover:text-white text-2xl px-1"
+                aria-label="Next character"
+              >
+                ›
+              </button>
+            </div>
           </div>
-          <div className="text-4xl text-yellow-300 self-center" style={{ fontFamily: "var(--font-pixel)" }}>
+
+          <div className="text-3xl text-yellow-300 self-center" style={{ fontFamily: "var(--font-pixel)" }}>
             VS
           </div>
+
+          {/* Player 2 picker */}
           <div className="text-center">
-            <div className="text-6xl mb-2">👩‍🦰</div>
-            <span className="text-red-400" style={{ fontFamily: "var(--font-pixel)", fontSize: "10px" }}>
+            <span className="text-red-400 block mb-2" style={{ fontFamily: "var(--font-pixel)", fontSize: "9px" }}>
               PLAYER 2
             </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setP2Char((c) => (c - 1 + CHARACTERS.length) % CHARACTERS.length)}
+                className="text-white/70 hover:text-white text-2xl px-1"
+                aria-label="Previous character"
+              >
+                ‹
+              </button>
+              <div className="flex flex-col items-center">
+                <PixelCharacter charIndex={p2Char} isRunning={false} isCelebrating={false} size={56} />
+                <span className="text-yellow-300 mt-1" style={{ fontFamily: "var(--font-pixel)", fontSize: "7px" }}>
+                  {CHARACTERS[p2Char].name}
+                </span>
+              </div>
+              <button
+                onClick={() => setP2Char((c) => (c + 1) % CHARACTERS.length)}
+                className="text-white/70 hover:text-white text-2xl px-1"
+                aria-label="Next character"
+              >
+                ›
+              </button>
+            </div>
           </div>
         </div>
 
@@ -350,6 +399,8 @@ export default function Game() {
           isPlaying={isPlaying}
           p1Stumble={p1Stumble}
           p2Stumble={p2Stumble}
+          p1Char={p1Char}
+          p2Char={p2Char}
         />
       </div>
 

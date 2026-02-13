@@ -2,8 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 
+/** 8 selectable character palettes */
+export const CHARACTERS = [
+  { name: "Alex",  hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#4A9EFF", dark: "#2563EB", pants: "#2D3A4F", shoe: "#FF6B6B", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Ruby",  hair: "#2D1B2E", skin: "#FFD5A5", eye: "#222034", body: "#FF5757", dark: "#D92B2B", pants: "#3D2D4F", shoe: "#5BA3FF", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Sunny", hair: "#E8C858", skin: "#FFD5A5", eye: "#222034", body: "#FFC107", dark: "#E6A800", pants: "#3B5249", shoe: "#4CAF50", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Jade",  hair: "#1A1A2E", skin: "#FFD5A5", eye: "#222034", body: "#2ECC71", dark: "#1FA855", pants: "#2D3A4F", shoe: "#FF9800", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Coral", hair: "#D46A3A", skin: "#FFD5A5", eye: "#222034", body: "#FF8A9E", dark: "#E5667A", pants: "#4A3A50", shoe: "#4DD0C9", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Storm", hair: "#9CA3AF", skin: "#FFD5A5", eye: "#222034", body: "#8B5CF6", dark: "#6D28D9", pants: "#1E293B", shoe: "#FBBF24", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Mint",  hair: "#5C3317", skin: "#FFD5A5", eye: "#222034", body: "#14B8A6", dark: "#0D9488", pants: "#3D2D4F", shoe: "#F472B6", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Blaze", hair: "#6B2020", skin: "#FFD5A5", eye: "#222034", body: "#FF7B00", dark: "#E66A00", pants: "#2D3A4F", shoe: "#3B82F6", mouth: "#FF6B6B", blush: "#FFB3B3" },
+];
+
 interface PixelCharacterProps {
-  color: "blue" | "red";
+  /** Index into CHARACTERS array */
+  charIndex: number;
   isRunning: boolean;
   isCelebrating: boolean;
   isStumbling?: boolean;
@@ -16,7 +29,7 @@ interface PixelCharacterProps {
  * 16x16 grid rendered as SVG rects.
  */
 export default function PixelCharacter({
-  color,
+  charIndex,
   isRunning,
   isCelebrating,
   isStumbling = false,
@@ -38,18 +51,7 @@ export default function PixelCharacter({
 
   // 0=transparent 1=hair 2=skin 3=eye 4=body 5=dark-body
   // 6=pants 7=shoe 8=mouth 9=blush/cheek
-  const palette =
-    color === "blue"
-      ? {
-          hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034",
-          body: "#4A9EFF", dark: "#2563EB", pants: "#2D3A4F",
-          shoe: "#FF6B6B", mouth: "#FF6B6B", blush: "#FFB3B3",
-        }
-      : {
-          hair: "#2D1B2E", skin: "#FFD5A5", eye: "#222034",
-          body: "#FF5757", dark: "#D92B2B", pants: "#3D2D4F",
-          shoe: "#5BA3FF", mouth: "#FF6B6B", blush: "#FFB3B3",
-        };
+  const palette = CHARACTERS[charIndex] ?? CHARACTERS[0];
 
   // Head + torso rows (shared across all frames) — rows 0-10
   // Chibi proportions: large round head (rows 0-6), small torso (rows 7-10)
