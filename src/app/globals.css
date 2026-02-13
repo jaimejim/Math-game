@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-pixel: "Press Start 2P", monospace;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  font-family: var(--font-pixel), monospace;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+/* ── Road / track animation ── */
+@keyframes road-scroll {
+  0% { background-position-y: 0; }
+  100% { background-position-y: 80px; }
+}
+
+.road-bg {
+  background-color: #6b7b3a;
+  background-image:
+    /* lane dashes */
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 20px,
+      #8a9e54 20px,
+      #8a9e54 40px
+    );
+  background-size: 100% 80px;
+  animation: road-scroll 0.6s linear infinite;
+}
+
+/* Finish line pattern */
+.finish-line {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #fff 0px, #fff 16px,
+    #222 16px, #222 32px
+  );
+  background-size: 32px 100%;
+}
+
+/* ── Pixel character sprites ── */
+.pixel-char {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Running bounce */
+@keyframes run-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.char-running {
+  animation: run-bounce 0.35s ease-in-out infinite;
+}
+
+/* Win celebration */
+@keyframes celebrate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-5deg); }
+  50% { transform: scale(1.2) rotate(0deg); }
+  75% { transform: scale(1.1) rotate(5deg); }
+}
+
+.char-celebrate {
+  animation: celebrate 0.5s ease-in-out infinite;
+}
+
+/* Trophy bounce */
+@keyframes trophy-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-20px) scale(1.1); }
+}
+
+.trophy-bounce {
+  animation: trophy-bounce 1s ease-in-out infinite;
+}
+
+/* ── Buttons ── */
+.btn-correct {
+  background: #22c55e;
+  box-shadow: 0 6px 0 #15803d, 0 8px 16px rgba(0,0,0,0.3);
+  transition: all 0.1s;
+}
+.btn-correct:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #15803d, 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.btn-wrong {
+  background: #ef4444;
+  box-shadow: 0 6px 0 #b91c1c, 0 8px 16px rgba(0,0,0,0.3);
+  transition: all 0.1s;
+}
+.btn-wrong:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #b91c1c, 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Flash feedback */
+@keyframes flash-green {
+  0% { background-color: rgba(34, 197, 94, 0.5); }
+  100% { background-color: transparent; }
+}
+@keyframes flash-red {
+  0% { background-color: rgba(239, 68, 68, 0.5); }
+  100% { background-color: transparent; }
+}
+
+.flash-correct {
+  animation: flash-green 0.4s ease-out;
+}
+.flash-wrong {
+  animation: flash-red 0.4s ease-out;
+}
+
+/* Progress dots */
+.dot-done {
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+}
+.dot-current {
+  background: #facc15;
+  box-shadow: 0 0 8px #facc15;
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+.dot-pending {
+  background: #4b5563;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+/* Confetti */
+@keyframes confetti-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  top: 0;
+  animation: confetti-fall linear forwards;
+}
+
+/* Scenery items scrolling */
+@keyframes scenery-scroll {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(calc(100vh + 100%)); }
+}
+
+/* Star twinkle */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
