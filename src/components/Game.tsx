@@ -16,20 +16,47 @@ import {
 const TOTAL_QUESTIONS = 10;
 const PENALTY = 2; // go back 2 steps on wrong answer
 
-/** Generate a simple addition or subtraction equation for kids */
-function generateEquation(): Equation {
-  const op = Math.random() > 0.5 ? "+" : "-";
+type Difficulty = "easy" | "medium" | "hard";
+type GameState = "menu" | "playing" | "finished";
+
+/** Pick a random operator based on difficulty */
+function pickOp(difficulty: Difficulty): "+" | "-" | "*" | "/" {
+  const ops: ("+" | "-" | "*" | "/")[] =
+    difficulty === "easy"
+      ? ["+", "-"]
+      : difficulty === "medium"
+      ? ["+", "-", "*"]
+      : ["+", "-", "*", "/"];
+  return ops[Math.floor(Math.random() * ops.length)];
+}
+
+/** Generate an equation appropriate for the chosen difficulty */
+function generateEquation(difficulty: Difficulty): Equation {
+  const op = pickOp(difficulty);
   let a: number, b: number, realAnswer: number;
 
-  if (op === "+") {
-    a = Math.floor(Math.random() * 20) + 1; // 1-20
-    b = Math.floor(Math.random() * 20) + 1;
-    realAnswer = a + b;
-  } else {
-    // Ensure non-negative result
-    a = Math.floor(Math.random() * 20) + 5; // 5-24
-    b = Math.floor(Math.random() * a) + 1; // 1 to a
-    realAnswer = a - b;
+  switch (op) {
+    case "+":
+      a = Math.floor(Math.random() * 20) + 1;
+      b = Math.floor(Math.random() * 20) + 1;
+      realAnswer = a + b;
+      break;
+    case "-":
+      a = Math.floor(Math.random() * 20) + 5;
+      b = Math.floor(Math.random() * a) + 1;
+      realAnswer = a - b;
+      break;
+    case "*":
+      a = Math.floor(Math.random() * 10) + 1;
+      b = Math.floor(Math.random() * 10) + 1;
+      realAnswer = a * b;
+      break;
+    case "/":
+      // Generate clean division: pick b and result, then a = b * result
+      b = Math.floor(Math.random() * 9) + 2; // 2-10
+      realAnswer = Math.floor(Math.random() * 10) + 1; // 1-10
+      a = b * realAnswer;
+      break;
   }
 
   // ~50% chance of showing the correct answer
@@ -39,17 +66,19 @@ function generateEquation(): Equation {
   if (isCorrect) {
     shown = realAnswer;
   } else {
-    // Show a wrong answer (offset by 1-3)
     const offset = Math.floor(Math.random() * 3) + 1;
     shown = Math.random() > 0.5 ? realAnswer + offset : realAnswer - offset;
-    // Avoid negative shown values
     if (shown < 0) shown = realAnswer + offset;
   }
 
   return { a, b, op, shown, isCorrect };
 }
 
-type GameState = "menu" | "playing" | "finished";
+const DIFFICULTY_META: Record<Difficulty, { label: string; desc: string; color: string; shadow: string }> = {
+  easy:   { label: "EASY",   desc: "+ and -",          color: "#22c55e", shadow: "#15803d" },
+  medium: { label: "MEDIUM", desc: "+ - and x",        color: "#f59e0b", shadow: "#b45309" },
+  hard:   { label: "HARD",   desc: "+ - x and \u00f7", color: "#ef4444", shadow: "#b91c1c" },
+};
 
 export default function Game() {
   const [gameState, setGameState] = useState<GameState>("menu");
@@ -58,13 +87,17 @@ export default function Game() {
   const [p1Equation, setP1Equation] = useState<Equation | null>(null);
   const [p2Equation, setP2Equation] = useState<Equation | null>(null);
   const [winner, setWinner] = useState<null | 1 | 2>(null);
-  const [p1Answered, setP1Answered] = useState(0); // questions answered
+  const [p1Answered, setP1Answered] = useState(0);
   const [p2Answered, setP2Answered] = useState(0);
 
   const [muted, setMuted] = useState(false);
+  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const winnerRef = useRef<null | 1 | 2>(null);
+  const diffRef = useRef<Difficulty>("easy");
 
-  const startGame = useCallback(() => {
+  const startGame = useCallback((diff: Difficulty) => {
+    diffRef.current = diff;
+    setDifficulty(diff);
     setGameState("playing");
     setP1Progress(0);
     setP2Progress(0);
@@ -72,8 +105,8 @@ export default function Game() {
     setP2Answered(0);
     setWinner(null);
     winnerRef.current = null;
-    setP1Equation(generateEquation());
-    setP2Equation(generateEquation());
+    setP1Equation(generateEquation(diff));
+    setP2Equation(generateEquation(diff));
     startBGM();
   }, []);
 
@@ -101,7 +134,7 @@ export default function Game() {
         setP1Progress(newProgress);
         checkWinner(1, newProgress);
         if (newProgress < TOTAL_QUESTIONS) {
-          setP1Equation(generateEquation());
+          setP1Equation(generateEquation(diffRef.current));
         } else {
           setP1Equation(null);
         }
@@ -109,7 +142,7 @@ export default function Game() {
         playWrongSFX();
         const newProgress = Math.max(0, p1Progress - PENALTY);
         setP1Progress(newProgress);
-        setP1Equation(generateEquation());
+        setP1Equation(generateEquation(diffRef.current));
       }
     },
     [p1Progress, p1Answered, checkWinner]
@@ -128,7 +161,7 @@ export default function Game() {
         setP2Progress(newProgress);
         checkWinner(2, newProgress);
         if (newProgress < TOTAL_QUESTIONS) {
-          setP2Equation(generateEquation());
+          setP2Equation(generateEquation(diffRef.current));
         } else {
           setP2Equation(null);
         }
@@ -136,7 +169,7 @@ export default function Game() {
         playWrongSFX();
         const newProgress = Math.max(0, p2Progress - PENALTY);
         setP2Progress(newProgress);
-        setP2Equation(generateEquation());
+        setP2Equation(generateEquation(diffRef.current));
       }
     },
     [p2Progress, p2Answered, checkWinner]
@@ -217,7 +250,7 @@ export default function Game() {
         </div>
 
         {/* Characters preview */}
-        <div className="relative z-10 flex gap-12 mb-8">
+        <div className="relative z-10 flex gap-12 mb-6">
           <div className="text-center">
             <div className="text-6xl mb-2">🧑‍🦱</div>
             <span className="text-blue-400" style={{ fontFamily: "var(--font-pixel)", fontSize: "10px" }}>
@@ -235,19 +268,37 @@ export default function Game() {
           </div>
         </div>
 
-        {/* Start button */}
-        <button
-          onClick={startGame}
-          className="relative z-10 px-10 py-5 bg-green-500 hover:bg-green-400 text-white rounded-2xl transition-all active:scale-95"
-          style={{
-            fontFamily: "var(--font-pixel)",
-            fontSize: "18px",
-            boxShadow: "0 6px 0 #15803d, 0 8px 20px rgba(0,0,0,0.4)",
-            textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
-          }}
+        {/* Difficulty selector */}
+        <div
+          className="relative z-10 text-white/60 mb-3"
+          style={{ fontFamily: "var(--font-pixel)", fontSize: "10px" }}
         >
-          START RACE!
-        </button>
+          CHOOSE DIFFICULTY
+        </div>
+        <div className="relative z-10 flex gap-4">
+          {(["easy", "medium", "hard"] as Difficulty[]).map((diff) => {
+            const meta = DIFFICULTY_META[diff];
+            return (
+              <button
+                key={diff}
+                onClick={() => startGame(diff)}
+                className="px-6 py-4 text-white rounded-2xl transition-all active:scale-95"
+                style={{
+                  fontFamily: "var(--font-pixel)",
+                  fontSize: "14px",
+                  background: meta.color,
+                  boxShadow: `0 6px 0 ${meta.shadow}, 0 8px 20px rgba(0,0,0,0.4)`,
+                  textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
+                }}
+              >
+                {meta.label}
+                <div style={{ fontSize: "7px", marginTop: "6px", opacity: 0.8 }}>
+                  {meta.desc}
+                </div>
+              </button>
+            );
+          })}
+        </div>
 
         {/* Keyboard hint */}
         <div
@@ -318,7 +369,7 @@ export default function Game() {
       {/* Play Again button when finished */}
       {winner && (
         <button
-          onClick={startGame}
+          onClick={() => startGame(difficulty)}
           className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-8 py-4 bg-green-500 hover:bg-green-400 text-white rounded-2xl transition-all active:scale-95"
           style={{
             fontFamily: "var(--font-pixel)",

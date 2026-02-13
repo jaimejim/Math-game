@@ -5,7 +5,7 @@ import React, { useState, useCallback } from "react";
 export interface Equation {
   a: number;
   b: number;
-  op: "+" | "-";
+  op: "+" | "-" | "*" | "/";
   shown: number; // the result displayed (may be wrong)
   isCorrect: boolean; // whether shown === real answer
 }
@@ -103,7 +103,7 @@ export default function MathPanel({
                 textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
               }}
             >
-              {equation.a} {equation.op} {equation.b}
+              {equation.a} {equation.op === "*" ? "\u00d7" : equation.op === "/" ? "\u00f7" : equation.op} {equation.b}
             </div>
             <div className="text-white/60 text-lg mb-1" style={{ fontFamily: "var(--font-pixel)", fontSize: "14px" }}>
               =
