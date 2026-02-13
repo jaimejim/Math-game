@@ -11,10 +11,9 @@ interface PixelCharacterProps {
 }
 
 /**
- * Pixel-art runner with two alternating leg frames for a proper running look.
- * Frame A: left leg forward / right leg back
- * Frame B: right leg forward / left leg back
- * When standing still, both legs are centered (neutral).
+ * Chibi-style pixel-art runner inspired by casual character pixel art.
+ * Big round head, rosy cheeks, colorful shirt, dark pants, chunky sneakers.
+ * 16x16 grid rendered as SVG rects.
  */
 export default function PixelCharacter({
   color,
@@ -37,59 +36,69 @@ export default function PixelCharacter({
     return () => clearInterval(interval);
   }, [isRunning]);
 
+  // 0=transparent 1=hair 2=skin 3=eye 4=body 5=dark-body
+  // 6=pants 7=shoe 8=mouth 9=blush/cheek
   const palette =
     color === "blue"
-      ? { body: "#3b82f6", dark: "#1d4ed8", skin: "#fcd34d", eye: "#1e293b", hair: "#92400e", shoe: "#1e3a5f" }
-      : { body: "#ef4444", dark: "#b91c1c", skin: "#fcd34d", eye: "#1e293b", hair: "#4a2000", shoe: "#7f1d1d" };
+      ? {
+          hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034",
+          body: "#4A9EFF", dark: "#2563EB", pants: "#2D3A4F",
+          shoe: "#FF6B6B", mouth: "#FF6B6B", blush: "#FFB3B3",
+        }
+      : {
+          hair: "#2D1B2E", skin: "#FFD5A5", eye: "#222034",
+          body: "#FF5757", dark: "#D92B2B", pants: "#3D2D4F",
+          shoe: "#5BA3FF", mouth: "#FF6B6B", blush: "#FFB3B3",
+        };
 
   // Head + torso rows (shared across all frames) — rows 0-10
-  // 0=transparent, 1=hair, 2=skin, 3=eye, 4=body, 5=dark body, 7=shoe, 8=mouth
+  // Chibi proportions: large round head (rows 0-6), small torso (rows 7-10)
   const upper = [
     /*  0 */ [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
-    /*  1 */ [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
-    /*  2 */ [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
-    /*  3 */ [0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,0],
-    /*  4 */ [0,0,0,2,2,3,2,2,2,2,3,2,2,0,0,0],
-    /*  5 */ [0,0,0,2,2,2,2,2,2,2,2,2,2,0,0,0],
+    /*  1 */ [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+    /*  2 */ [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+    /*  3 */ [0,0,1,1,2,2,2,2,2,2,2,2,1,1,0,0],
+    /*  4 */ [0,0,1,2,2,3,2,2,2,2,3,2,2,1,0,0],
+    /*  5 */ [0,0,0,2,2,2,9,2,2,9,2,2,2,0,0,0],
     /*  6 */ [0,0,0,0,2,2,2,8,8,2,2,2,0,0,0,0],
-    /*  7 */ [0,0,0,0,0,4,4,4,4,4,4,0,0,0,0,0],
-    /*  8 */ [0,0,0,0,4,4,4,4,4,4,4,4,0,0,0,0],
-    /*  9 */ [0,0,0,4,4,5,4,4,4,4,5,4,4,0,0,0],
-    /* 10 */ [0,0,0,4,4,4,4,4,4,4,4,4,4,0,0,0],
+    /*  7 */ [0,0,0,0,4,4,4,4,4,4,4,4,0,0,0,0],
+    /*  8 */ [0,0,0,2,4,4,5,4,4,5,4,4,2,0,0,0],
+    /*  9 */ [0,0,0,0,4,4,4,4,4,4,4,4,0,0,0,0],
+    /* 10 */ [0,0,0,0,0,6,6,6,6,6,6,0,0,0,0,0],
   ];
 
-  // Neutral legs (standing still)
+  // Neutral legs (standing still) — pants + chunky sneakers
   const legsNeutral = [
-    /* 11 */ [0,0,0,0,0,2,2,0,0,2,2,0,0,0,0,0],
-    /* 12 */ [0,0,0,0,0,2,2,0,0,2,2,0,0,0,0,0],
-    /* 13 */ [0,0,0,0,0,2,2,0,0,2,2,0,0,0,0,0],
+    /* 11 */ [0,0,0,0,0,6,6,0,0,6,6,0,0,0,0,0],
+    /* 12 */ [0,0,0,0,0,6,6,0,0,6,6,0,0,0,0,0],
+    /* 13 */ [0,0,0,0,0,6,6,0,0,6,6,0,0,0,0,0],
     /* 14 */ [0,0,0,0,0,7,7,0,0,7,7,0,0,0,0,0],
-    /* 15 */ [0,0,0,0,0,7,7,0,0,7,7,0,0,0,0,0],
+    /* 15 */ [0,0,0,0,7,7,7,0,0,7,7,7,0,0,0,0],
   ];
 
-  // Frame A: left leg extended forward, right leg extended back
+  // Frame A: left leg forward, right leg back
   const legsFrameA = [
-    /* 11 */ [0,0,0,0,2,2,0,0,0,0,2,2,0,0,0,0],
-    /* 12 */ [0,0,0,2,2,0,0,0,0,0,0,2,0,0,0,0],
-    /* 13 */ [0,0,2,2,0,0,0,0,0,0,0,2,2,0,0,0],
+    /* 11 */ [0,0,0,0,6,6,0,0,0,0,6,6,0,0,0,0],
+    /* 12 */ [0,0,0,6,6,0,0,0,0,0,0,6,0,0,0,0],
+    /* 13 */ [0,0,6,6,0,0,0,0,0,0,0,6,6,0,0,0],
     /* 14 */ [0,7,7,7,0,0,0,0,0,0,0,0,7,0,0,0],
-    /* 15 */ [0,7,7,0,0,0,0,0,0,0,0,0,7,7,0,0],
+    /* 15 */ [7,7,7,0,0,0,0,0,0,0,0,0,7,7,0,0],
   ];
 
-  // Frame B: right leg extended forward, left leg extended back
+  // Frame B: right leg forward, left leg back
   const legsFrameB = [
-    /* 11 */ [0,0,0,0,2,2,0,0,0,0,2,2,0,0,0,0],
-    /* 12 */ [0,0,0,0,2,0,0,0,0,0,2,2,0,0,0,0],
-    /* 13 */ [0,0,0,2,2,0,0,0,0,0,0,2,2,0,0,0],
+    /* 11 */ [0,0,0,0,6,6,0,0,0,0,6,6,0,0,0,0],
+    /* 12 */ [0,0,0,0,6,0,0,0,0,0,6,6,0,0,0,0],
+    /* 13 */ [0,0,0,6,6,0,0,0,0,0,0,6,6,0,0,0],
     /* 14 */ [0,0,0,7,0,0,0,0,0,0,7,7,7,0,0,0],
-    /* 15 */ [0,0,7,7,0,0,0,0,0,0,0,7,7,0,0,0],
+    /* 15 */ [0,0,7,7,0,0,0,0,0,0,0,7,7,7,0,0],
   ];
 
   // Stumble legs: splayed out flat (fallen over)
   const legsStumble = [
-    /* 11 */ [0,0,0,0,0,2,2,0,0,2,2,0,0,0,0,0],
-    /* 12 */ [0,0,0,0,2,2,0,0,0,0,2,2,0,0,0,0],
-    /* 13 */ [0,0,2,2,0,0,0,0,0,0,0,0,2,2,0,0],
+    /* 11 */ [0,0,0,0,0,6,6,0,0,6,6,0,0,0,0,0],
+    /* 12 */ [0,0,0,0,6,6,0,0,0,0,6,6,0,0,0,0],
+    /* 13 */ [0,0,6,6,0,0,0,0,0,0,0,0,6,6,0,0],
     /* 14 */ [0,7,7,0,0,0,0,0,0,0,0,0,0,7,7,0],
     /* 15 */ [7,7,0,0,0,0,0,0,0,0,0,0,0,0,7,7],
   ];
@@ -115,8 +124,10 @@ export default function PixelCharacter({
     3: palette.eye,
     4: palette.body,
     5: palette.dark,
+    6: palette.pants,
     7: palette.shoe,
-    8: "#ef4444",
+    8: palette.mouth,
+    9: palette.blush,
   };
 
   const px = size / 16;
