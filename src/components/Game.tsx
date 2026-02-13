@@ -14,7 +14,7 @@ import {
 } from "./ChiptuneAudio";
 
 const TOTAL_QUESTIONS = 10;
-const PENALTY = 2; // go back 2 steps on wrong answer
+const PENALTY = 3; // go back 3 steps on wrong answer
 
 type Difficulty = "easy" | "medium" | "hard";
 type GameState = "menu" | "playing" | "finished";

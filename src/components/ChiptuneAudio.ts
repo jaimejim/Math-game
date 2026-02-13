@@ -1,7 +1,7 @@
 /**
  * 8-bit chiptune music engine using Web Audio API.
- * Generates retro Mario-style background music, plus SFX
- * for correct answers, wrong answers, and winning.
+ * Generates "La Tarara" — a popular Spanish folk song — as
+ * background music, plus SFX for correct / wrong / winning.
  * No audio files needed — everything is synthesized.
  */
 
@@ -56,7 +56,7 @@ function playTone(
   osc.stop(ctx.currentTime + delay + duration);
 }
 
-// ── Note frequencies (octave 4-5) ──
+// ── Note frequencies (octave 4-6) ──
 const NOTE: Record<string, number> = {
   C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23,
   G4: 392.00, A4: 440.00, B4: 493.88,
@@ -67,56 +67,69 @@ const NOTE: Record<string, number> = {
   Cs5: 554.37, Ds5: 622.25, Fs5: 739.99, Gs5: 830.61, As5: 932.33,
 };
 
-// ── Background music: a catchy looping melody ──
-// Inspired by classic platformer style — upbeat and bouncy
+// ── Background music: "La Tarara" — traditional Spanish folk song ──
+// Lively chiptune arrangement in E minor, 3/4 feel
 
 interface MelodyNote {
   note: string;
   dur: number; // in beats
 }
 
-const BPM = 160;
+const BPM = 152;
 const BEAT = 60 / BPM; // seconds per beat
 
 const melody: MelodyNote[] = [
-  // Phrase 1 (ascending bounce)
-  { note: "E5", dur: 0.5 }, { note: "E5", dur: 0.5 }, { note: "E5", dur: 1 },
-  { note: "C5", dur: 0.5 }, { note: "E5", dur: 0.5 }, { note: "G5", dur: 1 },
-  { note: "G4", dur: 1 },
-  // Phrase 2
-  { note: "C5", dur: 1 }, { note: "G4", dur: 0.5 }, { note: "E4", dur: 1 },
-  { note: "A4", dur: 0.5 }, { note: "B4", dur: 0.5 }, { note: "As4", dur: 0.5 },
-  { note: "A4", dur: 0.5 },
-  // Phrase 3 (quick run)
-  { note: "G4", dur: 0.5 }, { note: "E5", dur: 0.5 }, { note: "G5", dur: 0.5 },
-  { note: "A5", dur: 0.5 }, { note: "F5", dur: 0.5 }, { note: "G5", dur: 0.5 },
-  { note: "E5", dur: 0.5 }, { note: "C5", dur: 0.5 }, { note: "D5", dur: 0.5 },
-  { note: "B4", dur: 0.5 },
+  // Refrain: "La Tarara sí, la Tarara no"
+  { note: "E4", dur: 1 },   { note: "G4", dur: 0.5 }, { note: "A4", dur: 0.5 },
+  { note: "B4", dur: 1 },   { note: "B4", dur: 0.5 }, { note: "B4", dur: 0.5 },
+  { note: "A4", dur: 1 },   { note: "G4", dur: 1 },
+  // "la Tarara niña, que la he visto yo"
+  { note: "E4", dur: 1 },   { note: "G4", dur: 0.5 }, { note: "A4", dur: 0.5 },
+  { note: "B4", dur: 1 },   { note: "A4", dur: 0.5 }, { note: "G4", dur: 0.5 },
+  { note: "Fs4", dur: 1 },  { note: "E4", dur: 1 },
+  // Verse: "Tiene la Tarara un jardín de flores"
+  { note: "B4", dur: 0.5 }, { note: "B4", dur: 0.5 }, { note: "B4", dur: 0.5 },
+  { note: "D5", dur: 0.5 }, { note: "C5", dur: 0.5 }, { note: "B4", dur: 0.5 },
+  { note: "A4", dur: 0.5 }, { note: "A4", dur: 0.5 }, { note: "G4", dur: 0.5 },
+  { note: "A4", dur: 0.5 }, { note: "B4", dur: 1 },
+  // "y me da si quiero siempre las mejores"
+  { note: "B4", dur: 0.5 }, { note: "B4", dur: 0.5 }, { note: "B4", dur: 0.5 },
+  { note: "D5", dur: 0.5 }, { note: "C5", dur: 0.5 }, { note: "B4", dur: 0.5 },
+  { note: "A4", dur: 0.5 }, { note: "G4", dur: 0.5 }, { note: "Fs4", dur: 0.5 },
+  { note: "E4", dur: 1.5 },
 ];
 
 const bass: MelodyNote[] = [
-  { note: "C4", dur: 1 }, { note: "G4", dur: 1 }, { note: "C4", dur: 1 },
-  { note: "G4", dur: 0.5 }, { note: "E4", dur: 0.5 },
-  { note: "C4", dur: 1 }, { note: "F4", dur: 1 }, { note: "G4", dur: 1 },
-  { note: "C4", dur: 0.5 }, { note: "E4", dur: 0.5 },
-  { note: "A4", dur: 1 }, { note: "G4", dur: 1 },
-  { note: "F4", dur: 0.5 }, { note: "E4", dur: 0.5 }, { note: "D4", dur: 0.5 },
-  { note: "C4", dur: 0.5 }, { note: "G4", dur: 1 },
-  { note: "C4", dur: 1 }, { note: "G4", dur: 0.5 }, { note: "C4", dur: 0.5 },
+  // Refrain bass (Em – Em – Am/C – Em)
+  { note: "E4", dur: 1 },  { note: "B4", dur: 1 },
+  { note: "E4", dur: 1 },  { note: "B4", dur: 1 },
+  { note: "A4", dur: 1 },  { note: "E4", dur: 1 },
+  // Second half refrain
+  { note: "E4", dur: 1 },  { note: "B4", dur: 1 },
+  { note: "E4", dur: 1 },  { note: "D4", dur: 1 },
+  { note: "B4", dur: 1 },  { note: "E4", dur: 1 },
+  // Verse bass
+  { note: "E4", dur: 1 },  { note: "G4", dur: 1 },
+  { note: "A4", dur: 1 },  { note: "E4", dur: 1 },
+  { note: "D4", dur: 1 },  { note: "B4", dur: 1 },
+  // Second verse half
+  { note: "E4", dur: 1 },  { note: "G4", dur: 1 },
+  { note: "A4", dur: 1 },  { note: "D4", dur: 1 },
+  { note: "B4", dur: 1 },  { note: "E4", dur: 1 },
 ];
 
 function playMelodyLoop() {
   if (!bgmPlaying) return;
 
   let time = 0;
-  // Lead melody
+  // Lead melody (square wave — bright chiptune lead)
   for (const n of melody) {
     const freq = NOTE[n.note];
     if (freq) playTone(freq, n.dur * BEAT * 0.85, "square", 0.25, time);
     time += n.dur * BEAT;
   }
 
-  // Bass line (triangle wave, lower volume)
+  // Bass line (triangle wave one octave lower, softer)
   let bassTime = 0;
   for (const n of bass) {
     const freq = NOTE[n.note];
@@ -159,16 +172,34 @@ export function playWrongSFX() {
   playTone(NOTE.C4, 0.18, "sawtooth", 0.3, 0.1);
 }
 
-/** SFX: winner fanfare */
+/** SFX: winner — celebratory fanfare with rapid ascending scale + triumphant chords */
 export function playWinSFX() {
-  const fanfare = [
-    { note: "C5", t: 0 }, { note: "E5", t: 0.12 }, { note: "G5", t: 0.24 },
-    { note: "C6", t: 0.36 }, { note: "E5", t: 0.52 }, { note: "G5", t: 0.64 },
-    { note: "C6", t: 0.76 },
-  ];
-  for (const n of fanfare) {
-    playTone(NOTE[n.note], 0.15, "square", 0.35, n.t);
-  }
+  // Rapid ascending scale
+  playTone(NOTE.C5, 0.10, "square", 0.30, 0);
+  playTone(NOTE.D5, 0.10, "square", 0.30, 0.08);
+  playTone(NOTE.E5, 0.10, "square", 0.30, 0.16);
+  playTone(NOTE.F5, 0.10, "square", 0.30, 0.24);
+  playTone(NOTE.G5, 0.10, "square", 0.30, 0.32);
+  playTone(NOTE.A5, 0.10, "square", 0.30, 0.40);
+  playTone(NOTE.B5, 0.10, "square", 0.30, 0.48);
+  playTone(NOTE.C6, 0.20, "square", 0.35, 0.56);
+
+  // Triumphant chord hit 1 (C major)
+  playTone(NOTE.C5, 0.25, "square", 0.30, 0.82);
+  playTone(NOTE.E5, 0.25, "square", 0.30, 0.82);
+  playTone(NOTE.G5, 0.25, "square", 0.30, 0.82);
+  playTone(NOTE.C6, 0.25, "square", 0.35, 0.82);
+
+  // Triumphant chord hit 2 (longer, resolving)
+  playTone(NOTE.C5, 0.40, "square", 0.30, 1.14);
+  playTone(NOTE.E5, 0.40, "square", 0.30, 1.14);
+  playTone(NOTE.G5, 0.40, "square", 0.30, 1.14);
+  playTone(NOTE.C6, 0.50, "square", 0.35, 1.14);
+
+  // Final high sparkle
+  playTone(NOTE.E5, 0.08, "square", 0.25, 1.60);
+  playTone(NOTE.G5, 0.08, "square", 0.25, 1.68);
+  playTone(NOTE.C6, 0.30, "square", 0.35, 1.76);
 }
 
 /** Set master volume (0-1) */
