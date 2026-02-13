@@ -35,15 +35,17 @@ function generateEquation(difficulty: Difficulty): Equation {
   const op = pickOp(difficulty);
   let a: number, b: number, realAnswer: number;
 
+  const easy = difficulty === "easy";
+
   switch (op) {
     case "+":
-      a = Math.floor(Math.random() * 20) + 1;
-      b = Math.floor(Math.random() * 20) + 1;
+      a = Math.floor(Math.random() * (easy ? 9 : 20)) + 1;
+      b = Math.floor(Math.random() * (easy ? 9 : 20)) + 1;
       realAnswer = a + b;
       break;
     case "-":
-      a = Math.floor(Math.random() * 20) + 5;
-      b = Math.floor(Math.random() * a) + 1;
+      a = Math.floor(Math.random() * (easy ? 7 : 20)) + (easy ? 2 : 5);
+      b = Math.floor(Math.random() * (a - 1)) + 1;
       realAnswer = a - b;
       break;
     case "*":
