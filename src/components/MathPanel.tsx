@@ -55,6 +55,17 @@ export default function MathPanel({
     [disabled, equation, onAnswer]
   );
 
+  // Use onTouchStart for multi-touch support (iPad two-player simultaneous taps).
+  // preventDefault stops the browser from synthesizing a click (no double-fire).
+  // onClick is kept as fallback for mouse / desktop.
+  const handleTouch = useCallback(
+    (playerSaysCorrect: boolean) => (e: React.TouchEvent) => {
+      e.preventDefault();
+      handleAnswer(playerSaysCorrect);
+    },
+    [handleAnswer]
+  );
+
   return (
     <div
       className={`relative flex flex-col items-center justify-between h-full px-2 py-4 ${
@@ -133,6 +144,7 @@ export default function MathPanel({
       <div className="flex gap-3 w-full px-2 mt-2">
         <button
           className="btn-correct flex-1 rounded-xl py-4 text-white text-3xl font-bold disabled:opacity-40"
+          onTouchStart={handleTouch(true)}
           onClick={() => handleAnswer(true)}
           disabled={disabled || !equation}
           aria-label="Correct"
@@ -141,6 +153,7 @@ export default function MathPanel({
         </button>
         <button
           className="btn-wrong flex-1 rounded-xl py-4 text-white text-3xl font-bold disabled:opacity-40"
+          onTouchStart={handleTouch(false)}
           onClick={() => handleAnswer(false)}
           disabled={disabled || !equation}
           aria-label="Wrong"
