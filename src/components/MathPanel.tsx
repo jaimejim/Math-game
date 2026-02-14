@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 
 export interface Equation {
   a: number;
@@ -37,10 +37,15 @@ export default function MathPanel({
   bgColor,
 }: MathPanelProps) {
   const [flash, setFlash] = useState<"correct" | "wrong" | null>(null);
+  const lockedRef = useRef(false);
 
   const handleAnswer = useCallback(
     (playerSaysCorrect: boolean) => {
-      if (disabled || !equation) return;
+      if (disabled || !equation || lockedRef.current) return;
+
+      // Lock to prevent double-tap registering on the next equation
+      lockedRef.current = true;
+      setTimeout(() => { lockedRef.current = false; }, 350);
 
       // Did the player judge correctly?
       const judgedRight =
