@@ -73,14 +73,14 @@ export default function MathPanel({
 
   return (
     <div
-      className={`relative flex flex-col items-center justify-between h-full px-2 py-4 ${
+      className={`math-panel relative flex flex-col items-center justify-between h-full px-2 py-4 ${
         flash === "correct" ? "flash-correct" : flash === "wrong" ? "flash-wrong" : ""
       }`}
       style={{ background: bgColor }}
     >
       {/* Player label */}
       <div
-        className="text-white text-center px-3 py-2 rounded-lg w-full"
+        className="player-label text-white text-center px-3 py-2 rounded-lg w-full"
         style={{
           fontFamily: "var(--font-pixel)",
           fontSize: "11px",
@@ -92,7 +92,7 @@ export default function MathPanel({
       </div>
 
       {/* Progress dots */}
-      <div className="flex gap-1.5 flex-wrap justify-center mt-2 px-1">
+      <div className="progress-dots flex gap-1.5 flex-wrap justify-center mt-2 px-1">
         {Array.from({ length: totalQuestions }, (_, i) => (
           <div
             key={i}
@@ -108,11 +108,11 @@ export default function MathPanel({
       </div>
 
       {/* Equation display */}
-      <div className="flex-1 flex flex-col items-center justify-center w-full">
+      <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0">
         {equation ? (
           <div className="text-center">
             <div
-              className="text-white mb-2"
+              className="eq-text text-white mb-2"
               style={{
                 fontFamily: "var(--font-pixel)",
                 fontSize: "24px",
@@ -121,11 +121,11 @@ export default function MathPanel({
             >
               {equation.a} {equation.op === "*" ? "\u00d7" : equation.op === "/" ? "\u00f7" : equation.op} {equation.b}
             </div>
-            <div className="text-white/60 text-lg mb-1" style={{ fontFamily: "var(--font-pixel)", fontSize: "14px" }}>
+            <div className="eq-equals text-white/60 text-lg mb-1" style={{ fontFamily: "var(--font-pixel)", fontSize: "14px" }}>
               =
             </div>
             <div
-              className="text-yellow-300 font-bold"
+              className="eq-answer text-yellow-300 font-bold"
               style={{
                 fontFamily: "var(--font-pixel)",
                 fontSize: "28px",
@@ -146,9 +146,9 @@ export default function MathPanel({
       </div>
 
       {/* Answer buttons */}
-      <div className="flex gap-3 w-full px-2 mt-2">
+      <div className="btn-row flex gap-3 w-full px-2 mt-2">
         <button
-          className="btn-correct flex-1 rounded-xl py-4 text-white text-3xl font-bold disabled:opacity-40"
+          className="btn-correct btn-answer flex-1 rounded-xl py-4 text-white text-3xl font-bold disabled:opacity-40"
           onTouchStart={handleTouch(true)}
           onClick={() => handleAnswer(true)}
           disabled={disabled || !equation}
@@ -157,7 +157,7 @@ export default function MathPanel({
           ✓
         </button>
         <button
-          className="btn-wrong flex-1 rounded-xl py-4 text-white text-3xl font-bold disabled:opacity-40"
+          className="btn-wrong btn-answer flex-1 rounded-xl py-4 text-white text-3xl font-bold disabled:opacity-40"
           onTouchStart={handleTouch(false)}
           onClick={() => handleAnswer(false)}
           disabled={disabled || !equation}
@@ -169,7 +169,7 @@ export default function MathPanel({
 
       {/* Score indicator */}
       <div
-        className="text-white/70 mt-2"
+        className="score-text text-white/70 mt-2"
         style={{ fontFamily: "var(--font-pixel)", fontSize: "8px" }}
       >
         {progress}/{totalQuestions}

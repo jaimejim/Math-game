@@ -344,7 +344,7 @@ export default function Game() {
   // ── Menu Screen ──
   if (gameState === "menu") {
     return (
-      <div className="h-screen w-screen flex flex-col items-center justify-center bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 overflow-hidden">
+      <div className="h-dvh w-screen flex flex-col items-center justify-center bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 overflow-hidden">
         {leaderboardOverlay}
 
         {/* Stars background */}
@@ -502,7 +502,7 @@ export default function Game() {
   const isPlaying = gameState === "playing" && winner === null;
 
   return (
-    <div className="h-screen w-screen flex overflow-hidden">
+    <div className="h-dvh w-screen flex overflow-hidden">
       <Confetti active={winner !== null} />
       {leaderboardOverlay}
 
