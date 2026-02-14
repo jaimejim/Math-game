@@ -14,22 +14,26 @@ export interface CharacterPalette {
   mouth: string;
   blush: string;
   stick?: string;
+  hairStyle?: "long" | "mushroom";
 }
 
-/** 12 selectable character palettes */
+/** 15 selectable character palettes */
 export const CHARACTERS: CharacterPalette[] = [
-  { name: "Alex",    hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#4A9EFF", dark: "#2563EB", pants: "#2D3A4F", shoe: "#FF6B6B", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Ruby",    hair: "#2D1B2E", skin: "#FFD5A5", eye: "#222034", body: "#FF5757", dark: "#D92B2B", pants: "#3D2D4F", shoe: "#5BA3FF", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Sunny",   hair: "#E8C858", skin: "#FFD5A5", eye: "#222034", body: "#FFC107", dark: "#E6A800", pants: "#3B5249", shoe: "#4CAF50", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Jade",    hair: "#1A1A2E", skin: "#FFD5A5", eye: "#222034", body: "#2ECC71", dark: "#1FA855", pants: "#2D3A4F", shoe: "#FF9800", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Coral",   hair: "#D46A3A", skin: "#FFD5A5", eye: "#222034", body: "#FF8A9E", dark: "#E5667A", pants: "#4A3A50", shoe: "#4DD0C9", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Storm",   hair: "#9CA3AF", skin: "#FFD5A5", eye: "#222034", body: "#8B5CF6", dark: "#6D28D9", pants: "#1E293B", shoe: "#FBBF24", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Mint",    hair: "#5C3317", skin: "#FFD5A5", eye: "#222034", body: "#14B8A6", dark: "#0D9488", pants: "#3D2D4F", shoe: "#F472B6", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Blaze",   hair: "#6B2020", skin: "#FFD5A5", eye: "#222034", body: "#FF7B00", dark: "#E66A00", pants: "#2D3A4F", shoe: "#3B82F6", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Giulia",  hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#FF69B4", dark: "#E5507A", pants: "#FF8AC4", shoe: "#FFFFFF", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Giacomo", hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#FF8C00", dark: "#E67700", pants: "#2563EB", shoe: "#1D4ED8", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Papa",    hair: "#FFD5A5", skin: "#FFD5A5", eye: "#222034", body: "#1A1A2E", dark: "#111111", pants: "#F0F0F0", shoe: "#111111", mouth: "#FF6B6B", blush: "#FFB3B3" },
-  { name: "Nonno",   hair: "#D4D4D4", skin: "#FFD5A5", eye: "#222034", body: "#6B7280", dark: "#4B5563", pants: "#4A3A3A", shoe: "#5C3A1E", mouth: "#FF6B6B", blush: "#FFB3B3", stick: "#8B5A2B" },
+  { name: "Alex",     hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#4A9EFF", dark: "#2563EB", pants: "#2D3A4F", shoe: "#FF6B6B", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Ruby",     hair: "#2D1B2E", skin: "#FFD5A5", eye: "#222034", body: "#FF5757", dark: "#D92B2B", pants: "#3D2D4F", shoe: "#5BA3FF", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Sunny",    hair: "#E8C858", skin: "#FFD5A5", eye: "#222034", body: "#FFC107", dark: "#E6A800", pants: "#3B5249", shoe: "#4CAF50", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Jade",     hair: "#1A1A2E", skin: "#FFD5A5", eye: "#222034", body: "#2ECC71", dark: "#1FA855", pants: "#2D3A4F", shoe: "#FF9800", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Coral",    hair: "#D46A3A", skin: "#FFD5A5", eye: "#222034", body: "#FF8A9E", dark: "#E5667A", pants: "#4A3A50", shoe: "#4DD0C9", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Storm",    hair: "#9CA3AF", skin: "#FFD5A5", eye: "#222034", body: "#8B5CF6", dark: "#6D28D9", pants: "#1E293B", shoe: "#FBBF24", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Mint",     hair: "#5C3317", skin: "#FFD5A5", eye: "#222034", body: "#14B8A6", dark: "#0D9488", pants: "#3D2D4F", shoe: "#F472B6", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Blaze",    hair: "#6B2020", skin: "#FFD5A5", eye: "#222034", body: "#FF7B00", dark: "#E66A00", pants: "#2D3A4F", shoe: "#3B82F6", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Giulia",   hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#FF69B4", dark: "#E5507A", pants: "#FF8AC4", shoe: "#FFFFFF", mouth: "#FF6B6B", blush: "#FFB3B3", hairStyle: "long" },
+  { name: "Giacomo",  hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#FF8C00", dark: "#E67700", pants: "#2563EB", shoe: "#1D4ED8", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Giovanni", hair: "#1A1A2E", skin: "#FFD5A5", eye: "#222034", body: "#FFD5A5", dark: "#F0C090", pants: "#FFFFFF", shoe: "#FFD5A5", mouth: "#FF6B6B", blush: "#FFB3B3", hairStyle: "mushroom" },
+  { name: "Papa",     hair: "#FFD5A5", skin: "#FFD5A5", eye: "#222034", body: "#1A1A2E", dark: "#111111", pants: "#F0F0F0", shoe: "#111111", mouth: "#FF6B6B", blush: "#FFB3B3" },
+  { name: "Mamma",    hair: "#8B5E3C", skin: "#FFD5A5", eye: "#222034", body: "#009246", dark: "#007A3A", pants: "#FFFFFF", shoe: "#CE2B37", mouth: "#FF6B6B", blush: "#FFB3B3", hairStyle: "long" },
+  { name: "Nonno",    hair: "#D4D4D4", skin: "#FFD5A5", eye: "#222034", body: "#6B7280", dark: "#4B5563", pants: "#4A3A3A", shoe: "#5C3A1E", mouth: "#FF6B6B", blush: "#FFB3B3", stick: "#8B5A2B" },
+  { name: "Nonna",    hair: "#D4D4D4", skin: "#FFD5A5", eye: "#222034", body: "#6B7280", dark: "#4B5563", pants: "#4A3A3A", shoe: "#5C3A1E", mouth: "#FF6B6B", blush: "#FFB3B3", stick: "#8B5A2B", hairStyle: "long" },
 ];
 
 interface PixelCharacterProps {
@@ -71,9 +75,11 @@ export default function PixelCharacter({
   // 6=pants 7=shoe 8=mouth 9=blush/cheek
   const palette = CHARACTERS[charIndex] ?? CHARACTERS[0];
 
-  // Head + torso rows (shared across all frames) — rows 0-10
+  // Head + torso rows — rows 0-10
   // Chibi proportions: large round head (rows 0-6), small torso (rows 7-10)
-  const upper = [
+
+  // Default short hair
+  const upperDefault = [
     /*  0 */ [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
     /*  1 */ [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
     /*  2 */ [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
@@ -86,6 +92,42 @@ export default function PixelCharacter({
     /*  9 */ [0,0,0,0,4,4,4,4,4,4,4,4,0,0,0,0],
     /* 10 */ [0,0,0,0,0,6,6,6,6,6,6,0,0,0,0,0],
   ];
+
+  // Long hair: cascades down the sides past shoulders
+  const upperLong = [
+    /*  0 */ [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
+    /*  1 */ [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+    /*  2 */ [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+    /*  3 */ [0,0,1,1,2,2,2,2,2,2,2,2,1,1,0,0],
+    /*  4 */ [0,0,1,2,2,3,2,2,2,2,3,2,2,1,0,0],
+    /*  5 */ [0,0,1,2,2,2,9,2,2,9,2,2,2,1,0,0],
+    /*  6 */ [0,0,1,0,2,2,2,8,8,2,2,2,0,1,0,0],
+    /*  7 */ [0,0,1,0,4,4,4,4,4,4,4,4,0,1,0,0],
+    /*  8 */ [0,0,1,2,4,4,5,4,4,5,4,4,2,1,0,0],
+    /*  9 */ [0,0,1,0,4,4,4,4,4,4,4,4,0,1,0,0],
+    /* 10 */ [0,0,1,0,0,6,6,6,6,6,6,0,0,1,0,0],
+  ];
+
+  // Mushroom / bowl-cut hair: wide dome cap with straight fringe
+  const upperMushroom = [
+    /*  0 */ [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
+    /*  1 */ [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+    /*  2 */ [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    /*  3 */ [0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+    /*  4 */ [0,0,0,2,2,3,2,2,2,2,3,2,2,0,0,0],
+    /*  5 */ [0,0,0,2,2,2,9,2,2,9,2,2,2,0,0,0],
+    /*  6 */ [0,0,0,0,2,2,2,8,8,2,2,2,0,0,0,0],
+    /*  7 */ [0,0,0,0,4,4,4,4,4,4,4,4,0,0,0,0],
+    /*  8 */ [0,0,0,2,4,4,5,4,4,5,4,4,2,0,0,0],
+    /*  9 */ [0,0,0,0,4,4,4,4,4,4,4,4,0,0,0,0],
+    /* 10 */ [0,0,0,0,0,6,6,6,6,6,6,0,0,0,0,0],
+  ];
+
+  const upper = palette.hairStyle === "long"
+    ? upperLong
+    : palette.hairStyle === "mushroom"
+    ? upperMushroom
+    : upperDefault;
 
   // Neutral legs (standing still) — pants + chunky sneakers
   const legsNeutral = [
