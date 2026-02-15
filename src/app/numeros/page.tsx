@@ -1,9 +1,37 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 
 const PIX = { fontFamily: "var(--font-pixel)" };
+
+/* ── Mates leaderboard ── */
+const MATES_LB_KEY = "mates-leaderboard";
+
+interface MatesEntry {
+  name: string;
+  time: number;
+  date: string;
+}
+
+function loadLeaderboard(): MatesEntry[] {
+  try {
+    const raw = localStorage.getItem(MATES_LB_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLeaderboard(entries: MatesEntry[]) {
+  localStorage.setItem(MATES_LB_KEY, JSON.stringify(entries.slice(0, 5)));
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 /* ── Spanish speech ── */
 const SPANISH_NUMBERS = [
@@ -116,22 +144,34 @@ function DominoTile({
   );
 }
 
-/* ── Exercise card: horizontal domino + "a + b = [input]" ── */
-function ExerciseCard({ a, b }: { a: number; b: number }) {
+/* ── Exercise card ── */
+function ExerciseCard({
+  a,
+  b,
+  onCorrect,
+}: {
+  a: number;
+  b: number;
+  onCorrect: () => void;
+}) {
   const [answer, setAnswer] = useState("");
   const sum = a + b;
   const correct = answer === String(sum);
   const hasValue = answer.length > 0;
+  const reportedRef = useRef(false);
 
   const handleChange = useCallback(
     (val: string) => {
+      if (reportedRef.current) return;
       const cleaned = val.replace(/\D/g, "");
       setAnswer(cleaned);
       if (cleaned === String(sum)) {
         speak(SPANISH_NUMBERS[sum]);
+        reportedRef.current = true;
+        onCorrect();
       }
     },
-    [sum]
+    [sum, onCorrect]
   );
 
   return (
@@ -148,6 +188,7 @@ function ExerciseCard({ a, b }: { a: number; b: number }) {
           maxLength={2}
           value={answer}
           onChange={(e) => handleChange(e.target.value)}
+          disabled={correct}
           className={`w-10 h-9 text-center rounded-lg border-2 outline-none transition-colors font-bold ${
             correct
               ? "border-green-400 bg-green-400/20 text-green-300"
@@ -170,14 +211,186 @@ function ExerciseCard({ a, b }: { a: number; b: number }) {
 export default function NumerosPage() {
   const [exercises, setExercises] = useState(() => generateExercises());
   const [round, setRound] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [finished, setFinished] = useState(false);
+
+  // Timer
+  const [elapsed, setElapsed] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimeRef = useRef(0);
+
+  // Leaderboard
+  const [leaderboard, setLeaderboard] = useState<MatesEntry[]>([]);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [initials, setInitials] = useState("");
+  const [savedScore, setSavedScore] = useState(false);
+
+  useEffect(() => {
+    setLeaderboard(loadLeaderboard());
+  }, []);
+
+  // Start / restart timer each round
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+    setElapsed(0);
+    timerRef.current = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [round]);
+
+  const handleCorrect = useCallback(() => {
+    setCorrectCount((prev) => {
+      const next = prev + 1;
+      if (next === 9) {
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+          timerRef.current = null;
+        }
+        setFinished(true);
+      }
+      return next;
+    });
+  }, []);
 
   const handleShuffle = useCallback(() => {
     setExercises(generateExercises());
     setRound((r) => r + 1);
+    setCorrectCount(0);
+    setFinished(false);
+    setInitials("");
+    setSavedScore(false);
   }, []);
+
+  const handleSaveScore = useCallback(() => {
+    if (!initials.trim()) return;
+    const entry: MatesEntry = {
+      name: initials.toUpperCase().slice(0, 3),
+      time: elapsed,
+      date: new Date().toISOString(),
+    };
+    const updated = [...leaderboard, entry]
+      .sort((a, b) => a.time - b.time)
+      .slice(0, 5);
+    saveLeaderboard(updated);
+    setLeaderboard(updated);
+    setSavedScore(true);
+  }, [initials, elapsed, leaderboard]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950">
+      {/* Leaderboard overlay */}
+      {showLeaderboard && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
+          <div className="bg-indigo-950 border-2 border-yellow-400/50 rounded-2xl p-6 max-w-xs w-full mx-4">
+            <h2
+              className="text-yellow-300 text-center mb-4"
+              style={{ ...PIX, fontSize: "12px" }}
+            >
+              MATES TOP 5
+            </h2>
+            {leaderboard.length === 0 ? (
+              <p
+                className="text-white/50 text-center"
+                style={{ ...PIX, fontSize: "8px" }}
+              >
+                No scores yet!
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {leaderboard.map((e, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 text-white"
+                    style={{ ...PIX, fontSize: "9px" }}
+                  >
+                    <span className="text-yellow-400 w-4">{i + 1}.</span>
+                    <span className="flex-1">{e.name}</span>
+                    <span className="text-green-400">
+                      {formatTime(e.time)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={() => setShowLeaderboard(false)}
+              className="mt-4 w-full py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all"
+              style={{ ...PIX, fontSize: "9px" }}
+            >
+              CLOSE
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Completion overlay */}
+      {finished && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-indigo-950 border-2 border-green-400/50 rounded-2xl p-6 max-w-xs w-full mx-4 text-center">
+            <div className="text-4xl mb-3">🎉</div>
+            <h2
+              className="text-green-400 mb-2"
+              style={{ ...PIX, fontSize: "14px" }}
+            >
+              ALL CORRECT!
+            </h2>
+            <div
+              className="text-yellow-300 mb-4"
+              style={{ ...PIX, fontSize: "11px" }}
+            >
+              TIME: {formatTime(elapsed)}
+            </div>
+
+            {!savedScore ? (
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <input
+                  type="text"
+                  maxLength={3}
+                  value={initials}
+                  onChange={(e) =>
+                    setInitials(e.target.value.replace(/[^a-zA-Z]/g, ""))
+                  }
+                  placeholder="AAA"
+                  className="w-16 text-center py-1 bg-black/60 text-yellow-300 border border-yellow-400/50 rounded-lg uppercase"
+                  style={{ ...PIX, fontSize: "12px" }}
+                  autoFocus
+                />
+                <button
+                  onClick={handleSaveScore}
+                  disabled={initials.trim().length === 0}
+                  className="px-3 py-1 bg-yellow-500 hover:bg-yellow-400 disabled:opacity-40 text-black rounded-lg transition-all"
+                  style={{ ...PIX, fontSize: "8px" }}
+                >
+                  SAVE
+                </button>
+              </div>
+            ) : (
+              <div
+                className="text-green-400 mb-4"
+                style={{ ...PIX, fontSize: "8px" }}
+              >
+                SCORE SAVED!
+              </div>
+            )}
+
+            <button
+              onClick={handleShuffle}
+              className="w-full py-3 bg-green-500 hover:bg-green-400 text-white rounded-xl transition-all active:scale-95"
+              style={{
+                ...PIX,
+                fontSize: "11px",
+                boxShadow: "0 4px 0 #15803d",
+              }}
+            >
+              NEW ROUND
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Sticky header */}
       <header className="sticky top-0 z-10 bg-indigo-950/90 backdrop-blur-sm border-b border-white/10">
         <div className="flex items-center justify-between max-w-4xl mx-auto px-4 py-2">
@@ -188,25 +401,51 @@ export default function NumerosPage() {
           >
             ← BACK
           </Link>
-          <h1
-            className="text-yellow-300"
-            style={{
-              ...PIX,
-              fontSize: "14px",
-              textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-            }}
-          >
-            NÚMEROS
-          </h1>
-          {/* Shuffle / new exercises button */}
-          <button
-            onClick={handleShuffle}
-            className="text-white/70 hover:text-white active:scale-110 transition-all"
-            style={{ fontSize: "22px" }}
-            aria-label="New exercises"
-          >
-            ↻
-          </button>
+
+          {/* Timer + title + progress */}
+          <div className="flex items-center gap-3">
+            <span
+              className="text-yellow-300"
+              style={{ ...PIX, fontSize: "10px" }}
+            >
+              {formatTime(elapsed)}
+            </span>
+            <h1
+              className="text-yellow-300"
+              style={{
+                ...PIX,
+                fontSize: "14px",
+                textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
+              }}
+            >
+              NÚMEROS
+            </h1>
+            <span
+              className="text-white/50"
+              style={{ ...PIX, fontSize: "9px" }}
+            >
+              {correctCount}/9
+            </span>
+          </div>
+
+          {/* Right buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowLeaderboard(true)}
+              className="px-2 py-1 bg-black/40 hover:bg-black/60 text-yellow-300 rounded-lg transition-all"
+              style={{ ...PIX, fontSize: "7px" }}
+            >
+              TOP 5
+            </button>
+            <button
+              onClick={handleShuffle}
+              className="text-white/70 hover:text-white active:scale-110 transition-all"
+              style={{ fontSize: "22px" }}
+              aria-label="New exercises"
+            >
+              ↻
+            </button>
+          </div>
         </div>
 
         {/* Clickable number line 0-10 (speaks Spanish) */}
@@ -249,7 +488,12 @@ export default function NumerosPage() {
       <main className="max-w-3xl mx-auto px-4 py-6">
         <div className="grid grid-cols-3 gap-4">
           {exercises.map(([a, b], idx) => (
-            <ExerciseCard key={`${round}-${idx}`} a={a} b={b} />
+            <ExerciseCard
+              key={`${round}-${idx}`}
+              a={a}
+              b={b}
+              onCorrect={handleCorrect}
+            />
           ))}
         </div>
       </main>

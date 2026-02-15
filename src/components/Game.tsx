@@ -312,7 +312,7 @@ export default function Game() {
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60">
       <div className="bg-indigo-950 border-2 border-yellow-400/50 rounded-2xl p-6 max-w-xs w-full mx-4">
         <h2 className="text-yellow-300 text-center mb-4" style={{ ...PIX, fontSize: "12px" }}>
-          TOP 5
+          RACE TOP 5
         </h2>
         {leaderboard.length === 0 ? (
           <p className="text-white/50 text-center" style={{ ...PIX, fontSize: "8px" }}>
