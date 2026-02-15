@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useEffect, useRef } from "react";
+import Link from "next/link";
 import MathPanel, { Equation } from "./MathPanel";
 import RoadTrack from "./RoadTrack";
 import Confetti from "./Confetti";
@@ -493,6 +494,24 @@ export default function Game() {
           style={{ ...PIX, fontSize: "7px", lineHeight: "1.8" }}
         >
           Keyboard: P1 → Q(✓) A(✗) | P2 → P(✓) L(✗)
+        </div>
+
+        {/* Navigation links */}
+        <div className="relative z-10 mt-4 flex gap-6">
+          <Link
+            href="/numeros"
+            className="text-white/50 hover:text-white/80 transition-colors"
+            style={{ ...PIX, fontSize: "9px" }}
+          >
+            NÚMEROS
+          </Link>
+          <Link
+            href="/about"
+            className="text-white/50 hover:text-white/80 transition-colors"
+            style={{ ...PIX, fontSize: "9px" }}
+          >
+            ABOUT
+          </Link>
         </div>
       </div>
     );
