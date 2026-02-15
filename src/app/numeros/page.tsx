@@ -26,10 +26,11 @@ function speak(text: string) {
   speechSynthesis.speak(u);
 }
 
-/* ── Colors for 0-6 ── */
+/* ── Colors for 0-10 ── */
 const NUMBER_COLORS = [
   "#6b7280", "#ef4444", "#f97316", "#eab308",
-  "#22c55e", "#14b8a6", "#3b82f6",
+  "#22c55e", "#14b8a6", "#3b82f6", "#6366f1",
+  "#a855f7", "#ec4899", "#f59e0b",
 ];
 
 /* ── Dot positions in a 3×3 grid (standard domino patterns, 0-6) ── */
@@ -44,18 +45,21 @@ const DOT_PATTERNS: Record<number, DotPos[]> = {
   6: [[0, 0], [1, 0], [2, 0], [0, 2], [1, 2], [2, 2]],
 };
 
-/* 9 domino addition exercises (3×3 grid), all faces ≤ 6 */
-const EXERCISES: [number, number][] = [
-  [1, 1], // = 2
-  [2, 1], // = 3
-  [1, 2], // = 3
-  [2, 2], // = 4
-  [3, 1], // = 4
-  [3, 2], // = 5
-  [2, 3], // = 5
-  [3, 3], // = 6
-  [4, 2], // = 6
-];
+/* ── Generate 9 random exercises, each addend 1-6 ── */
+function generateExercises(): [number, number][] {
+  const exercises: [number, number][] = [];
+  const used = new Set<string>();
+  while (exercises.length < 9) {
+    const a = Math.floor(Math.random() * 6) + 1;
+    const b = Math.floor(Math.random() * 6) + 1;
+    const key = `${a},${b}`;
+    if (!used.has(key)) {
+      used.add(key);
+      exercises.push([a, b]);
+    }
+  }
+  return exercises;
+}
 
 /* ── Single domino face (square with dot pattern) ── */
 function DominoFace({ count, size }: { count: number; size: number }) {
@@ -86,37 +90,38 @@ function DominoFace({ count, size }: { count: number; size: number }) {
   );
 }
 
-/* ── Vertical domino tile: top face | divider | bottom face ── */
+/* ── Horizontal domino tile: left face | divider | right face ── */
 function DominoTile({
-  top,
-  bottom,
-  faceSize = 52,
+  left,
+  right,
+  faceSize = 48,
 }: {
-  top: number;
-  bottom: number;
+  left: number;
+  right: number;
   faceSize?: number;
 }) {
   return (
     <button
       type="button"
       onClick={() =>
-        speak(`${SPANISH_NUMBERS[top]} más ${SPANISH_NUMBERS[bottom]}`)
+        speak(`${SPANISH_NUMBERS[left]} más ${SPANISH_NUMBERS[right]}`)
       }
-      className="inline-flex flex-col border-[3px] border-gray-700 rounded-xl overflow-hidden
+      className="inline-flex flex-row border-[3px] border-gray-700 rounded-xl overflow-hidden
                  hover:border-yellow-400/70 active:scale-105 transition-all cursor-pointer"
     >
-      <DominoFace count={top} size={faceSize} />
-      <div className="h-[3px] bg-gray-600" />
-      <DominoFace count={bottom} size={faceSize} />
+      <DominoFace count={left} size={faceSize} />
+      <div className="w-[3px] bg-gray-600" />
+      <DominoFace count={right} size={faceSize} />
     </button>
   );
 }
 
-/* ── Exercise card: domino tile + "a + b = [input]" ── */
+/* ── Exercise card: horizontal domino + "a + b = [input]" ── */
 function ExerciseCard({ a, b }: { a: number; b: number }) {
   const [answer, setAnswer] = useState("");
   const sum = a + b;
   const correct = answer === String(sum);
+  const hasValue = answer.length > 0;
 
   const handleChange = useCallback(
     (val: string) => {
@@ -131,7 +136,7 @@ function ExerciseCard({ a, b }: { a: number; b: number }) {
 
   return (
     <div className="bg-white/10 rounded-2xl p-3 flex flex-col items-center gap-2 border border-white/10">
-      <DominoTile top={a} bottom={b} faceSize={48} />
+      <DominoTile left={a} right={b} faceSize={48} />
 
       <div className="flex items-center gap-1.5">
         <span className="text-white" style={{ ...PIX, fontSize: "13px" }}>
@@ -146,11 +151,16 @@ function ExerciseCard({ a, b }: { a: number; b: number }) {
           className={`w-10 h-9 text-center rounded-lg border-2 outline-none transition-colors font-bold ${
             correct
               ? "border-green-400 bg-green-400/20 text-green-300"
+              : hasValue
+              ? "border-red-400 bg-red-400/20 text-red-300"
               : "border-white/30 bg-white/10 text-white"
           }`}
           style={{ ...PIX, fontSize: "14px" }}
         />
         {correct && <span className="text-green-400 text-lg">✓</span>}
+        {hasValue && !correct && (
+          <span className="text-red-400 text-lg">✗</span>
+        )}
       </div>
     </div>
   );
@@ -158,6 +168,14 @@ function ExerciseCard({ a, b }: { a: number; b: number }) {
 
 /* ── Page ── */
 export default function NumerosPage() {
+  const [exercises, setExercises] = useState(() => generateExercises());
+  const [round, setRound] = useState(0);
+
+  const handleShuffle = useCallback(() => {
+    setExercises(generateExercises());
+    setRound((r) => r + 1);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950">
       {/* Sticky header */}
@@ -180,20 +198,28 @@ export default function NumerosPage() {
           >
             NÚMEROS
           </h1>
-          <div style={{ width: "60px" }} />
+          {/* Shuffle / new exercises button */}
+          <button
+            onClick={handleShuffle}
+            className="text-white/70 hover:text-white active:scale-110 transition-all"
+            style={{ fontSize: "22px" }}
+            aria-label="New exercises"
+          >
+            ↻
+          </button>
         </div>
 
-        {/* Clickable number line 0-6 (speaks Spanish) */}
-        <div className="flex justify-center gap-2 pb-2 px-2">
-          {Array.from({ length: 7 }, (_, i) => (
+        {/* Clickable number line 0-10 (speaks Spanish) */}
+        <div className="flex justify-center gap-1.5 pb-2 px-2 overflow-x-auto">
+          {Array.from({ length: 11 }, (_, i) => (
             <button
               key={i}
               onClick={() => speak(SPANISH_NUMBERS[i])}
-              className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full
+              className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full
                          text-white font-bold active:scale-110 transition-transform"
               style={{
                 ...PIX,
-                fontSize: "11px",
+                fontSize: "10px",
                 background: NUMBER_COLORS[i],
                 boxShadow: "0 2px 4px rgba(0,0,0,0.3)",
               }}
@@ -222,8 +248,8 @@ export default function NumerosPage() {
       {/* 3×3 exercise grid */}
       <main className="max-w-3xl mx-auto px-4 py-6">
         <div className="grid grid-cols-3 gap-4">
-          {EXERCISES.map(([a, b], idx) => (
-            <ExerciseCard key={idx} a={a} b={b} />
+          {exercises.map(([a, b], idx) => (
+            <ExerciseCard key={`${round}-${idx}`} a={a} b={b} />
           ))}
         </div>
       </main>
